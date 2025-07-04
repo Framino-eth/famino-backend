@@ -1,0 +1,86 @@
+{
+    "openapi": "3.0.0",
+    "components": {
+        "examples": {},
+        "headers": {},
+        "parameters": {},
+        "requestBodies": {},
+        "responses": {},
+        "schemas": {
+            "NftMetadata": {
+                "properties": {},
+                "type": "object",
+                "additionalProperties": {}
+            },
+            "Nft": {
+                "properties": {
+                    "contractAddress": {
+                        "type": "string"
+                    },
+                    "tokenId": {
+                        "type": "string"
+                    },
+                    "owner": {
+                        "type": "string"
+                    },
+                    "amount": {
+                        "type": "string"
+                    },
+                    "metadata": {
+                        "$ref": "#/components/schemas/NftMetadata"
+                    }
+                },
+                "required": [
+                    "contractAddress",
+                    "tokenId",
+                    "owner",
+                    "amount",
+                    "metadata"
+                ],
+                "type": "object",
+                "additionalProperties": false
+            }
+        },
+        "securitySchemes": {}
+    },
+    "info": {
+        "title": "framino",
+        "version": "1.0.0",
+        "license": {
+            "name": "ISC"
+        },
+        "contact": {}
+    },
+    "paths": {
+        "/nft": {
+            "get": {
+                "operationId": "GetNft",
+                "responses": {
+                    "200": {
+                        "description": "Ok",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Nft"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "NFT"
+                ],
+                "security": [],
+                "parameters": []
+            }
+        }
+    },
+    "servers": [
+        {
+            "url": "/"
+        }
+    ]
+}
