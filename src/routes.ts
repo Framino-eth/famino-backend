@@ -20,15 +20,6 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetContractInfoResponseModel": {
-        "dataType": "refObject",
-        "properties": {
-            "address": {"dataType":"string","required":true},
-            "abi": {"dataType":"array","array":{"dataType":"any"},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "NftMintRequest": {
         "dataType": "refObject",
         "properties": {
@@ -36,6 +27,15 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"double","required":true},
             "value": {"dataType":"double","required":true},
             "uri": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetContractInfoResponseModel": {
+        "dataType": "refObject",
+        "properties": {
+            "address": {"dataType":"string","required":true},
+            "abi": {"dataType":"array","array":{"dataType":"any"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -57,25 +57,55 @@ export function RegisterRoutes(app: Router) {
 
 
     
-        const argsUserController_donateUSDC: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsUserController_donateUSDCWithPaymaster: Record<string, TsoaRoute.ParameterSchema> = {
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"DonateRequest"},
         };
-        app.post('/framino/donate',
+        app.post('/framino/donate-USDC-with-paymaster',
             ...(fetchMiddlewares<RequestHandler>(UserController)),
-            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.donateUSDC)),
+            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.donateUSDCWithPaymaster)),
 
-            async function UserController_donateUSDC(request: ExRequest, response: ExResponse, next: any) {
+            async function UserController_donateUSDCWithPaymaster(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_donateUSDC, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_donateUSDCWithPaymaster, request, response });
 
                 const controller = new UserController();
 
               await templateService.apiHandler({
-                methodName: 'donateUSDC',
+                methodName: 'donateUSDCWithPaymaster',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsUserController_mintNftByWithPaymaster: Record<string, TsoaRoute.ParameterSchema> = {
+                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"NftMintRequest"},
+        };
+        app.post('/framino/mint-with-paymaster',
+            ...(fetchMiddlewares<RequestHandler>(UserController)),
+            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.mintNftByWithPaymaster)),
+
+            async function UserController_mintNftByWithPaymaster(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_mintNftByWithPaymaster, request, response });
+
+                const controller = new UserController();
+
+              await templateService.apiHandler({
+                methodName: 'mintNftByWithPaymaster',
                 controller,
                 response,
                 next,
@@ -105,36 +135,6 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'getContractInfo',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsUserController_mintNft: Record<string, TsoaRoute.ParameterSchema> = {
-                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"NftMintRequest"},
-        };
-        app.post('/framino/mint',
-            ...(fetchMiddlewares<RequestHandler>(UserController)),
-            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.mintNft)),
-
-            async function UserController_mintNft(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_mintNft, request, response });
-
-                const controller = new UserController();
-
-              await templateService.apiHandler({
-                methodName: 'mintNft',
                 controller,
                 response,
                 next,

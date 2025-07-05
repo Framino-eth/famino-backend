@@ -16,33 +16,25 @@ export class UserController extends Controller {
 
     private framinoService = new FraminoService()
 
-    @Post("donate")
-    public async donateUSDC(
+    @Post("donate-USDC-with-paymaster")
+    public async donateUSDCWithPaymaster(
         @Body() requestBody: DonateRequest
         ): Promise<{ txHash: string }> {
-        const result = await this.framinoService.donateUSDCService(requestBody);
+        const result = await this.framinoService.donateUSDCWithPaymasterService(requestBody);
+        return result;
+    }
+
+    @Post("mint-with-paymaster")
+    public async mintNftByWithPaymaster(
+        @Body() requestBody: NftMintRequest
+    ): Promise<{ txHash: string }> {
+        const result = await this.framinoService.mintNftWithPaymasterService(requestBody);
         return result;
     }
 
     @Get("contract")
     public async getContractInfo(): Promise<GetContractInfoResponseModel> {
         const result = await this.framinoService.getContractInfoService();
-        return result;
-    }
-
-    @Post("mint-paymaster")
-    public async mintNftByPaymaster(
-        @Body() requestBody: NftMintRequest
-    ): Promise<{ txHash: string }> {
-        const result = await this.framinoService.mintNftWithPaymasterByOwner(requestBody);
-        return result;
-    }
-
-    @Post("mint")
-    public async mintNft(
-        @Body() requestBody: NftMintRequest
-    ): Promise<{ txHash: string }> {
-        const result = await this.framinoService.mintNftService(requestBody);
         return result;
     }
 }

@@ -33,7 +33,7 @@ export class FraminoService {
     this.contract = new ethers.Contract(contractAddress, FraminoNFTAbi, this.wallet);
   }
 
-  public async donateUSDCService(body: DonateRequest): Promise<{ txHash: string }> {
+  public async donateUSDCWithPaymasterService(body: DonateRequest): Promise<{ txHash: string }> {
     // 1. Load environment variables and parameters
     const chain = arbitrumSepolia; // Use Sepolia testnet
     const usdcAddress = process.env.USDC_ADDRESS as `0x${string}`;
@@ -154,7 +154,7 @@ export class FraminoService {
     return { txHash: tx.hash };
   }
 
-  public async mintNftWithPaymasterByOwner(body: NftMintRequest): Promise<{ txHash: string }> {
+  public async mintNftWithPaymasterService(body: NftMintRequest): Promise<{ txHash: string }> {
     const chain = arbitrumSepolia;
     const paymasterAddress = process.env.PAYMASTER_V08_ADDRESS as `0x${string}`;
     const contractAddress = process.env.FRAMINO_NFT_CONTRACT_ADDRESS as `0x${string}`;
@@ -255,8 +255,6 @@ export class FraminoService {
 
     return { txHash: receipt.receipt.transactionHash };
   }
-
-  
 
   public async getContractInfoService() {
     const contractAddress = process.env.FRAMINO_NFT_CONTRACT_ADDRESS!;
