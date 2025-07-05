@@ -1,22 +1,18 @@
 import {
     Body,
     Controller,
+    Get,
     Post,
     Route,
     Tags,
 } from "tsoa";
 import { FraminoService } from "../service/framinoService";
-import { DonateRequest } from "../model/framinoModel";
+import { DonateRequest, GetContractInfoResponseModel, NftRedeemRequest } from "../model/framinoModel";
 import { NftMintRequest } from "../model/framinoModel";
 
 @Tags("Framino")
 @Route("framino")
 export class UserController extends Controller {    
-    // @Get("")
-    // public async getNft(): Promise<Nft[]> {
-    //     const result = await framinoService.getNft();
-    //     return result;
-    // }
 
     private framinoService = new FraminoService()
 
@@ -25,6 +21,12 @@ export class UserController extends Controller {
         @Body() requestBody: DonateRequest
         ): Promise<{ txHash: string }> {
         const result = await this.framinoService.donateUSDCService(requestBody);
+        return result;
+    }
+
+    @Get("contract")
+    public async getContractInfo(): Promise<GetContractInfoResponseModel> {
+        const result = await this.framinoService.getContractInfoService();
         return result;
     }
 

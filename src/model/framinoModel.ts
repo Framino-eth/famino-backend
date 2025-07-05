@@ -30,9 +30,20 @@ export interface DonateRequest {
     amount: string; // USDC amount as string
 }
 
+export interface GetContractInfoResponseModel {
+    address: string; // contract address
+    abi: any[];      // contract ABI
+}
+
 export interface NftMintRequest {
   account: string; // recipient address
   id: number;      // tokenId 0-3 uncompleted: Spring, Summer, Autumn, Winter; 4-7 completed: Spring, Summer, Autumn, Winter
   value: number;   // initial balance
   uri: string;     // metadata URI
+}
+
+export interface NftRedeemRequest {
+  id: number;             // tokenId
+  amount: number;         // amount to redeem
+  userPrivateKey: string; // user's private key (for demo; in production use wallet signature flow)
 }

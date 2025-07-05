@@ -1,4 +1,4 @@
-import { Nft, NftMintRequest } from "../model/framinoModel";
+import { Nft, NftMintRequest, NftRedeemRequest } from "../model/framinoModel";
 import { ethers } from "ethers";
 import "dotenv/config";
 import { erc20Abi, encodePacked, http, getContract, createPublicClient } from "viem";
@@ -26,24 +26,11 @@ export class FraminoService {
   constructor() {
     const providerUrl = process.env.PROVIDER_URL!;
     const privateKey = process.env.CONTRACT_OWNER_PRIVATE_KEY!;
-    const contractAddress = process.env.NFT_CONTRACT_ADDRESS!;
+    const contractAddress = process.env.FRAMINO_NFT_CONTRACT_ADDRESS!;
 
     this.provider = new ethers.JsonRpcProvider(providerUrl);
     this.wallet = new ethers.Wallet(privateKey, this.provider);
     this.contract = new ethers.Contract(contractAddress, FraminoNFTAbi, this.wallet);
-  }
-
-  public async getNft(): Promise<Nft[]> {
-    // mock data
-    return [
-      new Nft({
-        contractAddress: "0x1234567890abcdef",
-        tokenId: "1",
-        owner: "0xabcdef1234567890",
-        amount: "1",
-        metadata: { name: "NFT #1", description: "A sample NFT" }
-      })
-    ];
   }
 
   public async donateUSDCService(body: DonateRequest): Promise<{ txHash: string }> {
@@ -165,5 +152,14 @@ export class FraminoService {
     const tx = await this.contract.mint(account, id, value, uri, data);
     await tx.wait();
     return { txHash: tx.hash };
+  }
+
+  public async getContractInfoService() {
+    const contractAddress = process.env.FRAMINO_NFT_CONTRACT_ADDRESS!;
+    
+    return {
+      address: contractAddress,
+      abi: FraminoNFTAbi,
+    };
   }
 }
