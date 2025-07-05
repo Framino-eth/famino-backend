@@ -15,7 +15,6 @@ const models: TsoaRoute.Models = {
     "DonateRequest": {
         "dataType": "refObject",
         "properties": {
-            "recipient": {"dataType":"string","required":true},
             "amount": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
@@ -39,7 +38,7 @@ export function RegisterRoutes(app: Router) {
 
     
         const argsUserController_donateUSDC: Record<string, TsoaRoute.ParameterSchema> = {
-                body: {"in":"body","name":"body","required":true,"ref":"DonateRequest"},
+                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"DonateRequest"},
         };
         app.post('/framino/donate',
             ...(fetchMiddlewares<RequestHandler>(UserController)),

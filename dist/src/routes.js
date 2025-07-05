@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterRoutes = RegisterRoutes;
 const runtime_1 = require("@tsoa/runtime");
@@ -18,7 +9,6 @@ const models = {
     "DonateRequest": {
         "dataType": "refObject",
         "properties": {
-            "recipient": { "dataType": "string", "required": true },
             "amount": { "dataType": "string", "required": true },
         },
         "additionalProperties": false,
@@ -33,28 +23,26 @@ function RegisterRoutes(app) {
     //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
     // ###########################################################################################################
     const argsUserController_donateUSDC = {
-        body: { "in": "body", "name": "body", "required": true, "ref": "DonateRequest" },
+        requestBody: { "in": "body", "name": "requestBody", "required": true, "ref": "DonateRequest" },
     };
-    app.post('/framino/donate', ...((0, runtime_1.fetchMiddlewares)(framinoController_1.UserController)), ...((0, runtime_1.fetchMiddlewares)(framinoController_1.UserController.prototype.donateUSDC)), function UserController_donateUSDC(request, response, next) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-            let validatedArgs = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_donateUSDC, request, response });
-                const controller = new framinoController_1.UserController();
-                yield templateService.apiHandler({
-                    methodName: 'donateUSDC',
-                    controller,
-                    response,
-                    next,
-                    validatedArgs,
-                    successStatus: undefined,
-                });
-            }
-            catch (err) {
-                return next(err);
-            }
-        });
+    app.post('/framino/donate', ...((0, runtime_1.fetchMiddlewares)(framinoController_1.UserController)), ...((0, runtime_1.fetchMiddlewares)(framinoController_1.UserController.prototype.donateUSDC)), async function UserController_donateUSDC(request, response, next) {
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args: argsUserController_donateUSDC, request, response });
+            const controller = new framinoController_1.UserController();
+            await templateService.apiHandler({
+                methodName: 'donateUSDC',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

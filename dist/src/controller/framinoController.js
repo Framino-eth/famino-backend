@@ -8,36 +8,23 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const tsoa_1 = require("tsoa");
-const dotenv_1 = __importDefault(require("dotenv"));
 const framinoService_1 = require("../service/framinoService");
-dotenv_1.default.config();
-const framinoService = new framinoService_1.FraminoService;
 let UserController = class UserController extends tsoa_1.Controller {
-    // @Get("")
-    // public async getNft(): Promise<Nft[]> {
-    //     const result = await framinoService.getNft();
-    //     return result;
-    // }
-    donateUSDC(body) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = framinoService.donateUSDCService(body);
-            return result;
-        });
+    constructor() {
+        // @Get("")
+        // public async getNft(): Promise<Nft[]> {
+        //     const result = await framinoService.getNft();
+        //     return result;
+        // }
+        super(...arguments);
+        this.framinoService = new framinoService_1.FraminoService();
+    }
+    async donateUSDC(requestBody) {
+        const result = await this.framinoService.donateUSDCService(requestBody);
+        return result;
     }
 };
 exports.UserController = UserController;

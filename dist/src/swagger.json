@@ -9,15 +9,11 @@
         "schemas": {
             "DonateRequest": {
                 "properties": {
-                    "recipient": {
-                        "type": "string"
-                    },
                     "amount": {
                         "type": "string"
                     }
                 },
                 "required": [
-                    "recipient",
                     "amount"
                 ],
                 "type": "object",

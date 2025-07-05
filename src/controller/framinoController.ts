@@ -5,12 +5,8 @@ import {
     Route,
     Tags,
 } from "tsoa";
-import dotenv from "dotenv";
 import { FraminoService } from "../service/framinoService";
 import { DonateRequest } from "../model/framinoModel";
-dotenv.config();
-
-const framinoService = new FraminoService
 
 @Tags("Framino")
 @Route("framino")
@@ -21,10 +17,13 @@ export class UserController extends Controller {
     //     return result;
     // }
 
+    private framinoService = new FraminoService()
+
     @Post("donate")
-    public async donateUSDC(@Body() body: DonateRequest): Promise<{ txHash: string }> {
-        const result = framinoService.donateUSDCService(body);
+    public async donateUSDC(
+        @Body() requestBody: DonateRequest
+        ): Promise<{ txHash: string }> {
+        const result = await this.framinoService.donateUSDCService(requestBody);
         return result;
     }
-
 }

@@ -1,6 +1,7 @@
 import express, {json, urlencoded} from 'express'
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json'
+import { RegisterRoutes } from "./routes";
 
 const port = process.env.PORT || 3000
 
@@ -14,6 +15,8 @@ class Server {
             })
         );
         this.app.use(json());
+
+        RegisterRoutes(this.app);
 
         this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
         

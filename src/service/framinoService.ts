@@ -2,11 +2,9 @@ import { Nft } from "../model/framinoModel";
 
 import "dotenv/config";
 import { erc20Abi, encodePacked, http, getContract, createPublicClient } from "viem";
-import { sepolia } from "viem/chains";
+import { arbitrumSepolia, sepolia } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
-import {
-  createBundlerClient,
-} from "viem/account-abstraction";
+import { createBundlerClient, toSimple7702SmartAccount } from "viem/account-abstraction";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -34,20 +32,16 @@ export class FraminoService {
 
   public async donateUSDCService(body: DonateRequest): Promise<{ txHash: string }> {
     // 1. Load environment variables and parameters
-    const chain = sepolia; // Use Sepolia testnet
+    const chain = arbitrumSepolia; // Use Sepolia testnet
     const usdcAddress = process.env.USDC_ADDRESS as `0x${string}`;
     const paymasterAddress = process.env.PAYMASTER_V08_ADDRESS as `0x${string}`;
     const ownerPrivateKey = process.env.OWNER_PRIVATE_KEY as `0x${string}`;
-    const amount = BigInt(Math.floor(Number(body.amount) * 1e6)); // USDC uses 6 decimals
 
     // 2. Create viem clients
     const client = createPublicClient({ chain, transport: http() });
     const owner = privateKeyToAccount(ownerPrivateKey);
 
     // 3. Get the smart account (EIP-7702)
-    // If you use a custom smart account, adjust accordingly
-    // @ts-ignore
-    const { toSimple7702SmartAccount } = await import("viem/account-abstraction");
     const account = await toSimple7702SmartAccount({ client, owner });
 
     // 4. Get USDC contract
@@ -55,6 +49,8 @@ export class FraminoService {
 
     // 5. Check USDC balance
     const usdcBalance = await usdc.read.balanceOf([account.address]);
+    const amount = BigInt(Math.floor(Number(body.amount) * 1e6)); // USDC uses 6 decimals
+
     if (usdcBalance < amount) {
         throw new Error(`Insufficient USDC balance. Please fund ${account.address}`);
     }
@@ -62,7 +58,7 @@ export class FraminoService {
     // 6. Sign permit
     const paymaster = {
         async getPaymasterData(parameters: any) {
-            const permitAmount = BigInt(10000000);
+            const permitAmount = hexToBigInt('0x100000000');
             const permitSignature = await signPermit({
             tokenAddress: usdcAddress,
             account,
@@ -79,13 +75,12 @@ export class FraminoService {
             return {
             paymaster: paymasterAddress,
             paymasterData,
-            paymasterVerificationGasLimit: BigInt(200000),
-            paymasterPostOpGasLimit: BigInt(15000),
+            paymasterVerificationGasLimit: hexToBigInt('0x200000'),
+            paymasterPostOpGasLimit: hexToBigInt('0x15000'),
             isFinal: true,
             };
         },
     };
-
 
     // 7. Encode paymasterData
     const bundlerClient = createBundlerClient({
@@ -97,9 +92,19 @@ export class FraminoService {
             const fees = await bundlerClient.request({
                 method: "pimlico_getUserOperationGasPrice" as any,
             });
-            const maxFeePerGas = hexToBigInt((fees as any).maxFeePerGas);
-            const maxPriorityFeePerGas = hexToBigInt((fees as any).maxPriorityFeePerGas);
-            return { maxFeePerGas, maxPriorityFeePerGas };
+            if (
+                typeof fees === "object" &&
+                fees !== null &&
+                "standard" in fees &&
+                typeof (fees as any).standard === "object"
+            ) {
+                const maxFeePerGas = hexToBigInt((fees as any).standard.maxFeePerGas);
+                const maxPriorityFeePerGas = hexToBigInt((fees as any).standard.maxPriorityFeePerGas);
+
+                return { maxFeePerGas, maxPriorityFeePerGas };
+            } else {
+                throw new Error("Unexpected response from pimlico_getUserOperationGasPrice: " + JSON.stringify(fees));
+            }
             },
         },
         transport: http(`https://public.pimlico.io/v2/${client.chain.id}/rpc`),
@@ -112,9 +117,9 @@ export class FraminoService {
 
     // 8. Sign authorization for 7702 account
     const authorization = await owner.signAuthorization({
-    chainId: chain.id,
-    nonce: await client.getTransactionCount({ address: owner.address }),
-    contractAddress: account.authorization.address,
+      chainId: chain.id,
+      nonce: await client.getTransactionCount({ address: owner.address }),
+      contractAddress: account.authorization.address,
     });
 
     const hash = await bundlerClient.sendUserOperation({
@@ -124,7 +129,7 @@ export class FraminoService {
         to: usdc.address,
         abi: usdc.abi,
         functionName: "transfer",
-        args: [recipientAddress, BigInt(10000)],
+        args: [recipientAddress, amount],
         },
     ],
     authorization: authorization,
@@ -133,10 +138,7 @@ export class FraminoService {
 
     const receipt = await bundlerClient.waitForUserOperationReceipt({ hash });
     console.log("Transaction hash", receipt.receipt.transactionHash);
-
-    // We need to manually exit the process, since viem leaves some promises on the
-    // event loop for features we're not using.
-    // process.exit();
+    
     return { txHash: receipt.receipt.transactionHash };
   }
 }

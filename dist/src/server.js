@@ -39,6 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importStar(require("express"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_json_1 = __importDefault(require("./swagger.json"));
+const routes_1 = require("./routes");
 const port = process.env.PORT || 3000;
 class Server {
     constructor() {
@@ -49,6 +50,7 @@ class Server {
             extended: true,
         }));
         this.app.use((0, express_1.json)());
+        (0, routes_1.RegisterRoutes)(this.app);
         this.app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_json_1.default));
         this.app.get('/', (req, res) => {
             res.send('Hello World!');
