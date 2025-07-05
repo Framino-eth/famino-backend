@@ -30,6 +30,14 @@ export class UserController extends Controller {
         return result;
     }
 
+    @Post("mint-paymaster")
+    public async mintNftByPaymaster(
+        @Body() requestBody: NftMintRequest
+    ): Promise<{ txHash: string }> {
+        const result = await this.framinoService.mintNftWithPaymasterByOwner(requestBody);
+        return result;
+    }
+
     @Post("mint")
     public async mintNft(
         @Body() requestBody: NftMintRequest

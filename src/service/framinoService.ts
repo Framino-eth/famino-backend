@@ -1,4 +1,4 @@
-import { Nft, NftMintRequest, NftRedeemRequest } from "../model/framinoModel";
+import { NftMintRequest, NftRedeemRequest } from "../model/framinoModel";
 import { ethers } from "ethers";
 import "dotenv/config";
 import { erc20Abi, encodePacked, http, getContract, createPublicClient } from "viem";
@@ -153,6 +153,110 @@ export class FraminoService {
     await tx.wait();
     return { txHash: tx.hash };
   }
+
+  public async mintNftWithPaymasterByOwner(body: NftMintRequest): Promise<{ txHash: string }> {
+    const chain = arbitrumSepolia;
+    const paymasterAddress = process.env.PAYMASTER_V08_ADDRESS as `0x${string}`;
+    const contractAddress = process.env.FRAMINO_NFT_CONTRACT_ADDRESS as `0x${string}`;
+    const ownerPrivateKey = process.env.CONTRACT_OWNER_PRIVATE_KEY as `0x${string}`;
+    const usdcAddress = process.env.USDC_ADDRESS as `0x${string}`;
+
+    // 1. Create viem client
+    const client = createPublicClient({ chain, transport: http() });
+    const owner = privateKeyToAccount(ownerPrivateKey);
+
+    // 2. Get the owner's smart account (4337 wallet)
+    const account = await toSimple7702SmartAccount({ client, owner });
+
+    // 3. Set up the paymaster
+    const paymaster = {
+        async getPaymasterData(parameters: any) {
+            const permitAmount = hexToBigInt('0x100000000');
+            const permitSignature = await signPermit({
+            tokenAddress: usdcAddress,
+            account,
+            client,
+            spenderAddress: paymasterAddress,
+            permitAmount: permitAmount,
+            });
+
+            const paymasterData = encodePacked(
+            ["uint8", "address", "uint256", "bytes"],
+            [0, usdcAddress, permitAmount, permitSignature],
+            );
+
+            return {
+            paymaster: paymasterAddress,
+            paymasterData,
+            paymasterVerificationGasLimit: hexToBigInt('0x200000'),
+            paymasterPostOpGasLimit: hexToBigInt('0x15000'),
+            isFinal: true,
+            };
+        },
+    };
+
+
+    // 4. Create the bundler client
+    const bundlerClient = createBundlerClient({
+      account,
+      client,
+      paymaster,
+      userOperation: {
+        estimateFeesPerGas: async ({ account, bundlerClient, userOperation }) => {
+          const fees = await bundlerClient.request({
+            method: "pimlico_getUserOperationGasPrice" as any,
+          });
+          if (
+            typeof fees === "object" &&
+            fees !== null &&
+            "standard" in fees &&
+            typeof (fees as any).standard === "object"
+          ) {
+            const maxFeePerGas = hexToBigInt((fees as any).standard.maxFeePerGas);
+            const maxPriorityFeePerGas = hexToBigInt((fees as any).standard.maxPriorityFeePerGas);
+
+            return { maxFeePerGas, maxPriorityFeePerGas };
+          } else {
+            throw new Error("Unexpected response from pimlico_getUserOperationGasPrice: " + JSON.stringify(fees));
+          }
+        },
+      },
+      transport: http(`https://public.pimlico.io/v2/${client.chain.id}/rpc`),
+    });
+
+    // 5. Prepare the mint call
+    const { account: to, id, value, uri } = body;
+    const data = "0x";
+
+    // 6. Sign authorization for the smart account
+    const authorization = await owner.signAuthorization({
+      chainId: chain.id,
+      nonce: await client.getTransactionCount({ address: owner.address }),
+      contractAddress: account.authorization.address,
+    });
+
+    // 7. Send the mint transaction as a UserOperation
+    const hash = await bundlerClient.sendUserOperation({
+      account,
+      calls: [
+        {
+          to: contractAddress,
+          abi: FraminoNFTAbi,
+          functionName: "mint",
+          args: [to, id, value, uri, data],
+        },
+      ],
+      authorization: authorization,
+    });
+    console.log("OwnerOperation hash", hash);
+
+    const receipt = await bundlerClient.waitForUserOperationReceipt({ hash });
+    console.log("Transaction hash", receipt.receipt.transactionHash);
+
+    return { txHash: receipt.receipt.transactionHash };
+  }
+
+  
 
   public async getContractInfoService() {
     const contractAddress = process.env.FRAMINO_NFT_CONTRACT_ADDRESS!;
