@@ -14,6 +14,13 @@ export interface NftMintRequest {
   uri: string;     // metadata URI
 }
 
+export interface NftMarkCompletedRequest {
+  user: string;   // The pilgrim's wallet address
+  id: number;        // The NFT tokenId
+  newUri: string;    // The new metadata URI for the completed NFT
+}
+
+
 export interface NftRedeemRequest {
   id: number;             // tokenId
   amount: number;         // amount to redeem

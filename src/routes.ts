@@ -4,7 +4,7 @@
 import type { TsoaRoute } from '@tsoa/runtime';
 import {  fetchMiddlewares, ExpressTemplateService } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { UserController } from './controller/framinoController';
+import { FraminoController } from './controller/framinoController';
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
 
 
@@ -27,6 +27,16 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"double","required":true},
             "value": {"dataType":"double","required":true},
             "uri": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "NftMarkCompletedRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "user": {"dataType":"string","required":true},
+            "id": {"dataType":"double","required":true},
+            "newUri": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -57,22 +67,22 @@ export function RegisterRoutes(app: Router) {
 
 
     
-        const argsUserController_donateUSDCWithPaymaster: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsFraminoController_donateUSDCWithPaymaster: Record<string, TsoaRoute.ParameterSchema> = {
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"DonateRequest"},
         };
         app.post('/framino/donate-USDC-with-paymaster',
-            ...(fetchMiddlewares<RequestHandler>(UserController)),
-            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.donateUSDCWithPaymaster)),
+            ...(fetchMiddlewares<RequestHandler>(FraminoController)),
+            ...(fetchMiddlewares<RequestHandler>(FraminoController.prototype.donateUSDCWithPaymaster)),
 
-            async function UserController_donateUSDCWithPaymaster(request: ExRequest, response: ExResponse, next: any) {
+            async function FraminoController_donateUSDCWithPaymaster(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_donateUSDCWithPaymaster, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsFraminoController_donateUSDCWithPaymaster, request, response });
 
-                const controller = new UserController();
+                const controller = new FraminoController();
 
               await templateService.apiHandler({
                 methodName: 'donateUSDCWithPaymaster',
@@ -87,22 +97,22 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsUserController_mintNftByWithPaymaster: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsFraminoController_mintNftByWithPaymaster: Record<string, TsoaRoute.ParameterSchema> = {
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"NftMintRequest"},
         };
         app.post('/framino/mint-with-paymaster',
-            ...(fetchMiddlewares<RequestHandler>(UserController)),
-            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.mintNftByWithPaymaster)),
+            ...(fetchMiddlewares<RequestHandler>(FraminoController)),
+            ...(fetchMiddlewares<RequestHandler>(FraminoController.prototype.mintNftByWithPaymaster)),
 
-            async function UserController_mintNftByWithPaymaster(request: ExRequest, response: ExResponse, next: any) {
+            async function FraminoController_mintNftByWithPaymaster(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_mintNftByWithPaymaster, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsFraminoController_mintNftByWithPaymaster, request, response });
 
-                const controller = new UserController();
+                const controller = new FraminoController();
 
               await templateService.apiHandler({
                 methodName: 'mintNftByWithPaymaster',
@@ -117,21 +127,51 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsUserController_getContractInfo: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsFraminoController_markCompleted: Record<string, TsoaRoute.ParameterSchema> = {
+                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"NftMarkCompletedRequest"},
         };
-        app.get('/framino/contract',
-            ...(fetchMiddlewares<RequestHandler>(UserController)),
-            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getContractInfo)),
+        app.post('/framino/mark-completed-with-paymaster',
+            ...(fetchMiddlewares<RequestHandler>(FraminoController)),
+            ...(fetchMiddlewares<RequestHandler>(FraminoController.prototype.markCompleted)),
 
-            async function UserController_getContractInfo(request: ExRequest, response: ExResponse, next: any) {
+            async function FraminoController_markCompleted(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_getContractInfo, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsFraminoController_markCompleted, request, response });
 
-                const controller = new UserController();
+                const controller = new FraminoController();
+
+              await templateService.apiHandler({
+                methodName: 'markCompleted',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsFraminoController_getContractInfo: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/framino/contract',
+            ...(fetchMiddlewares<RequestHandler>(FraminoController)),
+            ...(fetchMiddlewares<RequestHandler>(FraminoController.prototype.getContractInfo)),
+
+            async function FraminoController_getContractInfo(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsFraminoController_getContractInfo, request, response });
+
+                const controller = new FraminoController();
 
               await templateService.apiHandler({
                 methodName: 'getContractInfo',

@@ -45,6 +45,27 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"NftMarkCompletedRequest": {
+				"properties": {
+					"user": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"newUri": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"user",
+					"id",
+					"newUri"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"GetContractInfoResponseModel": {
 				"properties": {
 					"address": {
@@ -148,6 +169,46 @@
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/NftMintRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/framino/mark-completed-with-paymaster": {
+			"post": {
+				"operationId": "MarkCompleted",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"txHash": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"txHash"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Framino"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NftMarkCompletedRequest"
 							}
 						}
 					}
