@@ -7,7 +7,7 @@ import {
     Tags,
 } from "tsoa";
 import { FraminoService } from "../service/framinoService";
-import { DonateRequest, GetContractInfoResponseModel, NftMarkCompletedRequest, NftRedeemRequest } from "../model/framinoModel";
+import { DonateRequest, GetContractInfoResponseModel, NftMarkCompletedRequest } from "../model/framinoModel";
 import { NftMintRequest } from "../model/framinoModel";
 
 @Tags("Framino")

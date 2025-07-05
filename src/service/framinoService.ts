@@ -1,8 +1,8 @@
-import { NftMarkCompletedRequest, NftMintRequest, NftRedeemRequest } from "../model/framinoModel";
+import { NftMarkCompletedRequest, NftMintRequest } from "../model/framinoModel";
 import { ethers } from "ethers";
 import "dotenv/config";
 import { erc20Abi, encodePacked, http, getContract, createPublicClient } from "viem";
-import { arbitrumSepolia, sepolia } from "viem/chains";
+import { arbitrumSepolia } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
 import { createBundlerClient, toSimple7702SmartAccount } from "viem/account-abstraction";
 import FraminoNFTAbi from "../abi/FraminoNFT.json";
