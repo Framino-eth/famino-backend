@@ -18,6 +18,32 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"NftMintRequest": {
+				"properties": {
+					"account": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"value": {
+						"type": "number",
+						"format": "double"
+					},
+					"uri": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"account",
+					"id",
+					"value",
+					"uri"
+				],
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {}
@@ -65,6 +91,46 @@
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/DonateRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/framino/mint": {
+			"post": {
+				"operationId": "MintNft",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"txHash": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"txHash"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Framino"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NftMintRequest"
 							}
 						}
 					}

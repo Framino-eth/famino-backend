@@ -1,10 +1,11 @@
-import { Nft } from "../model/framinoModel";
-
+import { Nft, NftMintRequest } from "../model/framinoModel";
+import { ethers } from "ethers";
 import "dotenv/config";
 import { erc20Abi, encodePacked, http, getContract, createPublicClient } from "viem";
 import { arbitrumSepolia, sepolia } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
 import { createBundlerClient, toSimple7702SmartAccount } from "viem/account-abstraction";
+import FraminoNFTAbi from "../abi/FraminoNFT.json";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -17,6 +18,21 @@ import { DonateRequest } from "../model/framinoModel";
  */
 // Note: This service is designed to work with the Sepolia testnet.
 export class FraminoService {
+
+  private provider: ethers.JsonRpcProvider;
+  private wallet: ethers.Wallet;
+  private contract: ethers.Contract;
+
+  constructor() {
+    const providerUrl = process.env.PROVIDER_URL!;
+    const privateKey = process.env.CONTRACT_OWNER_PRIVATE_KEY!;
+    const contractAddress = process.env.NFT_CONTRACT_ADDRESS!;
+
+    this.provider = new ethers.JsonRpcProvider(providerUrl);
+    this.wallet = new ethers.Wallet(privateKey, this.provider);
+    this.contract = new ethers.Contract(contractAddress, FraminoNFTAbi, this.wallet);
+  }
+
   public async getNft(): Promise<Nft[]> {
     // mock data
     return [
@@ -35,11 +51,11 @@ export class FraminoService {
     const chain = arbitrumSepolia; // Use Sepolia testnet
     const usdcAddress = process.env.USDC_ADDRESS as `0x${string}`;
     const paymasterAddress = process.env.PAYMASTER_V08_ADDRESS as `0x${string}`;
-    const ownerPrivateKey = process.env.OWNER_PRIVATE_KEY as `0x${string}`;
+    const senderPrivateKey = process.env.SENDER_PRIVATE_KEY as `0x${string}`;
 
     // 2. Create viem clients
     const client = createPublicClient({ chain, transport: http() });
-    const owner = privateKeyToAccount(ownerPrivateKey);
+    const owner = privateKeyToAccount(senderPrivateKey);
 
     // 3. Get the smart account (EIP-7702)
     const account = await toSimple7702SmartAccount({ client, owner });
@@ -138,7 +154,16 @@ export class FraminoService {
 
     const receipt = await bundlerClient.waitForUserOperationReceipt({ hash });
     console.log("Transaction hash", receipt.receipt.transactionHash);
-    
+
     return { txHash: receipt.receipt.transactionHash };
+  }
+
+  public async mintNftService(body: NftMintRequest): Promise<{ txHash: string }> {
+    const { account, id, value, uri } = body;
+    // bytes data can be empty
+    const data = "0x";
+    const tx = await this.contract.mint(account, id, value, uri, data);
+    await tx.wait();
+    return { txHash: tx.hash };
   }
 }

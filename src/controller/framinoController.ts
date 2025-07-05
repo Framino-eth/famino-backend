@@ -7,6 +7,7 @@ import {
 } from "tsoa";
 import { FraminoService } from "../service/framinoService";
 import { DonateRequest } from "../model/framinoModel";
+import { NftMintRequest } from "../model/framinoModel";
 
 @Tags("Framino")
 @Route("framino")
@@ -24,6 +25,14 @@ export class UserController extends Controller {
         @Body() requestBody: DonateRequest
         ): Promise<{ txHash: string }> {
         const result = await this.framinoService.donateUSDCService(requestBody);
+        return result;
+    }
+
+    @Post("mint")
+    public async mintNft(
+        @Body() requestBody: NftMintRequest
+    ): Promise<{ txHash: string }> {
+        const result = await this.framinoService.mintNftService(requestBody);
         return result;
     }
 }

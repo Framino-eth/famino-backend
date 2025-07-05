@@ -27,6 +27,12 @@ export class Nft {
 }
 
 export interface DonateRequest {
-    amount: string; // USDC amount as string, e.g. "1.5"
+    amount: string; // USDC amount as string
 }
 
+export interface NftMintRequest {
+  account: string; // recipient address
+  id: number;      // tokenId 0-3 uncompleted: Spring, Summer, Autumn, Winter; 4-7 completed: Spring, Summer, Autumn, Winter
+  value: number;   // initial balance
+  uri: string;     // metadata URI
+}
