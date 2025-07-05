@@ -25,3 +25,9 @@ export class Nft {
     this.metadata = params.metadata;
   }
 }
+
+export interface DonateRequest {
+    recipient: string;
+    amount: string; // USDC amount as string, e.g. "1.5"
+}
+

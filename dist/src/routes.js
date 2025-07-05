@@ -15,20 +15,11 @@ const runtime_1 = require("@tsoa/runtime");
 const framinoController_1 = require("./controller/framinoController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const models = {
-    "NftMetadata": {
-        "dataType": "refObject",
-        "properties": {},
-        "additionalProperties": { "dataType": "any" },
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Nft": {
+    "DonateRequest": {
         "dataType": "refObject",
         "properties": {
-            "contractAddress": { "dataType": "string", "required": true },
-            "tokenId": { "dataType": "string", "required": true },
-            "owner": { "dataType": "string", "required": true },
+            "recipient": { "dataType": "string", "required": true },
             "amount": { "dataType": "string", "required": true },
-            "metadata": { "ref": "NftMetadata", "required": true },
         },
         "additionalProperties": false,
     },
@@ -41,16 +32,18 @@ function RegisterRoutes(app) {
     //  NOTE: If you do not see routes for all of your controllers in this file, then you might not have informed tsoa of where to look
     //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
     // ###########################################################################################################
-    const argsUserController_getNft = {};
-    app.get('/nft', ...((0, runtime_1.fetchMiddlewares)(framinoController_1.UserController)), ...((0, runtime_1.fetchMiddlewares)(framinoController_1.UserController.prototype.getNft)), function UserController_getNft(request, response, next) {
+    const argsUserController_donateUSDC = {
+        body: { "in": "body", "name": "body", "required": true, "ref": "DonateRequest" },
+    };
+    app.post('/framino/donate', ...((0, runtime_1.fetchMiddlewares)(framinoController_1.UserController)), ...((0, runtime_1.fetchMiddlewares)(framinoController_1.UserController.prototype.donateUSDC)), function UserController_donateUSDC(request, response, next) {
         return __awaiter(this, void 0, void 0, function* () {
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
             let validatedArgs = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_getNft, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_donateUSDC, request, response });
                 const controller = new framinoController_1.UserController();
                 yield templateService.apiHandler({
-                    methodName: 'getNft',
+                    methodName: 'donateUSDC',
                     controller,
                     response,
                     next,

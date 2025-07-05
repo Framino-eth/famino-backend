@@ -12,21 +12,11 @@ import type { Request as ExRequest, Response as ExResponse, RequestHandler, Rout
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "NftMetadata": {
+    "DonateRequest": {
         "dataType": "refObject",
         "properties": {
-        },
-        "additionalProperties": {"dataType":"any"},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Nft": {
-        "dataType": "refObject",
-        "properties": {
-            "contractAddress": {"dataType":"string","required":true},
-            "tokenId": {"dataType":"string","required":true},
-            "owner": {"dataType":"string","required":true},
+            "recipient": {"dataType":"string","required":true},
             "amount": {"dataType":"string","required":true},
-            "metadata": {"ref":"NftMetadata","required":true},
         },
         "additionalProperties": false,
     },
@@ -48,24 +38,25 @@ export function RegisterRoutes(app: Router) {
 
 
     
-        const argsUserController_getNft: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsUserController_donateUSDC: Record<string, TsoaRoute.ParameterSchema> = {
+                body: {"in":"body","name":"body","required":true,"ref":"DonateRequest"},
         };
-        app.get('/nft',
+        app.post('/framino/donate',
             ...(fetchMiddlewares<RequestHandler>(UserController)),
-            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getNft)),
+            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.donateUSDC)),
 
-            async function UserController_getNft(request: ExRequest, response: ExResponse, next: any) {
+            async function UserController_donateUSDC(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_getNft, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_donateUSDC, request, response });
 
                 const controller = new UserController();
 
               await templateService.apiHandler({
-                methodName: 'getNft',
+                methodName: 'donateUSDC',
                 controller,
                 response,
                 next,

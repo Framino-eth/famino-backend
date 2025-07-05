@@ -1,5 +1,23 @@
 import { Nft } from "../model/framinoModel";
 
+import "dotenv/config";
+import { erc20Abi, encodePacked, http, getContract, createPublicClient } from "viem";
+import { sepolia } from "viem/chains";
+import { privateKeyToAccount } from "viem/accounts";
+import {
+  createBundlerClient,
+} from "viem/account-abstraction";
+
+import dotenv from "dotenv";
+dotenv.config();
+import { signPermit } from "../service/permitService";
+import { hexToBigInt } from "viem";
+import { DonateRequest } from "../model/framinoModel";
+
+/**
+ * FraminoService provides methods to interact with NFTs and perform USDC donations.
+ */
+// Note: This service is designed to work with the Sepolia testnet.
 export class FraminoService {
   public async getNft(): Promise<Nft[]> {
     // mock data
@@ -12,5 +30,113 @@ export class FraminoService {
         metadata: { name: "NFT #1", description: "A sample NFT" }
       })
     ];
+  }
+
+  public async donateUSDCService(body: DonateRequest): Promise<{ txHash: string }> {
+    // 1. Load environment variables and parameters
+    const chain = sepolia; // Use Sepolia testnet
+    const usdcAddress = process.env.USDC_ADDRESS as `0x${string}`;
+    const paymasterAddress = process.env.PAYMASTER_V08_ADDRESS as `0x${string}`;
+    const ownerPrivateKey = process.env.OWNER_PRIVATE_KEY as `0x${string}`;
+    const amount = BigInt(Math.floor(Number(body.amount) * 1e6)); // USDC uses 6 decimals
+
+    // 2. Create viem clients
+    const client = createPublicClient({ chain, transport: http() });
+    const owner = privateKeyToAccount(ownerPrivateKey);
+
+    // 3. Get the smart account (EIP-7702)
+    // If you use a custom smart account, adjust accordingly
+    // @ts-ignore
+    const { toSimple7702SmartAccount } = await import("viem/account-abstraction");
+    const account = await toSimple7702SmartAccount({ client, owner });
+
+    // 4. Get USDC contract
+    const usdc = getContract({ client, address: usdcAddress, abi: erc20Abi });
+
+    // 5. Check USDC balance
+    const usdcBalance = await usdc.read.balanceOf([account.address]);
+    if (usdcBalance < amount) {
+        throw new Error(`Insufficient USDC balance. Please fund ${account.address}`);
+    }
+
+    // 6. Sign permit
+    const paymaster = {
+        async getPaymasterData(parameters: any) {
+            const permitAmount = BigInt(10000000);
+            const permitSignature = await signPermit({
+            tokenAddress: usdcAddress,
+            account,
+            client,
+            spenderAddress: paymasterAddress,
+            permitAmount: permitAmount,
+            });
+
+            const paymasterData = encodePacked(
+            ["uint8", "address", "uint256", "bytes"],
+            [0, usdcAddress, permitAmount, permitSignature],
+            );
+
+            return {
+            paymaster: paymasterAddress,
+            paymasterData,
+            paymasterVerificationGasLimit: BigInt(200000),
+            paymasterPostOpGasLimit: BigInt(15000),
+            isFinal: true,
+            };
+        },
+    };
+
+
+    // 7. Encode paymasterData
+    const bundlerClient = createBundlerClient({
+        account,
+        client,
+        paymaster,
+        userOperation: {
+            estimateFeesPerGas: async ({ account, bundlerClient, userOperation }) => {
+            const fees = await bundlerClient.request({
+                method: "pimlico_getUserOperationGasPrice" as any,
+            });
+            const maxFeePerGas = hexToBigInt((fees as any).maxFeePerGas);
+            const maxPriorityFeePerGas = hexToBigInt((fees as any).maxPriorityFeePerGas);
+            return { maxFeePerGas, maxPriorityFeePerGas };
+            },
+        },
+        transport: http(`https://public.pimlico.io/v2/${client.chain.id}/rpc`),
+    });
+    
+    const recipientAddress = process.env.RECIPIENT_ADDRESS as `0x${string}`;
+    if (!recipientAddress) {
+        throw new Error("RECIPIENT_ADDRESS environment variable is not set");
+    }
+
+    // 8. Sign authorization for 7702 account
+    const authorization = await owner.signAuthorization({
+    chainId: chain.id,
+    nonce: await client.getTransactionCount({ address: owner.address }),
+    contractAddress: account.authorization.address,
+    });
+
+    const hash = await bundlerClient.sendUserOperation({
+    account,
+    calls: [
+        {
+        to: usdc.address,
+        abi: usdc.abi,
+        functionName: "transfer",
+        args: [recipientAddress, BigInt(10000)],
+        },
+    ],
+    authorization: authorization,
+    });
+    console.log("UserOperation hash", hash);
+
+    const receipt = await bundlerClient.waitForUserOperationReceipt({ hash });
+    console.log("Transaction hash", receipt.receipt.transactionHash);
+
+    // We need to manually exit the process, since viem leaves some promises on the
+    // event loop for features we're not using.
+    // process.exit();
+    return { txHash: receipt.receipt.transactionHash };
   }
 }
