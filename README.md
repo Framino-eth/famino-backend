@@ -2,6 +2,11 @@
 
 A TypeScript-based REST API backend for the Framino NFT platform, built with Express.js and TSOA for automatic API documentation and route generation.
 
+<p align="center">
+  <img width="350" alt="Frame 3" src="https://github.com/user-attachments/assets/d5ea2b0c-fc91-4509-877e-6f6f320be839" />
+</p>
+
+
 ## Overview
 
 Framino is a blockchain-based application that enables users to mint, manage, and redeem NFTs representing seasonal pilgrimage journeys. The backend provides APIs for NFT operations, USDC donations, and smart contract interactions on the Arbitrum Sepolia testnet.
