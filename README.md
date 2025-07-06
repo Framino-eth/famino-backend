@@ -1,4 +1,6 @@
-# Framino Backend
+# Framino - Web3 Hiking Platform 🏔️
+
+## Framino Backend
 
 A TypeScript-based REST API backend for the Framino NFT platform, built with Express.js and TSOA for automatic API documentation and route generation.
 
