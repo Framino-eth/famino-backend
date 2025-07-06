@@ -7,7 +7,7 @@ import {
     Tags,
 } from "tsoa";
 import { FraminoService } from "../service/framinoService";
-import { DonateRequest, GetContractInfoResponseModel, NftMarkCompletedRequest } from "../model/framinoModel";
+import { DonateRequest, GetContractInfoResponseModel, NftMarkCompletedRequest, NftRedeemRequest } from "../model/framinoModel";
 import { NftMintRequest } from "../model/framinoModel";
 
 @Tags("Framino")
@@ -37,6 +37,14 @@ export class FraminoController extends Controller {
         @Body() requestBody: NftMarkCompletedRequest
     ): Promise<{ txHash: string }> {
         const result = await this.framinoService.markCompletedWithPaymasterService(requestBody);
+        return result;
+    }
+
+    @Post("redeem-with-paymaster")
+    public async redeemNft(
+        @Body() requestBody: NftRedeemRequest
+    ): Promise<{ txHash: string }> {
+        const result = await this.framinoService.redeemNftWithPaymasterService(requestBody);
         return result;
     }
 

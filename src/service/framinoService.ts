@@ -1,4 +1,4 @@
-import { NftMarkCompletedRequest, NftMintRequest } from "../model/framinoModel";
+import { NftMarkCompletedRequest, NftMintRequest, NftRedeemRequest } from "../model/framinoModel";
 import { ethers } from "ethers";
 import "dotenv/config";
 import { erc20Abi, encodePacked, http, getContract, createPublicClient } from "viem";
@@ -344,6 +344,103 @@ public async markCompletedWithPaymasterService(body: NftMarkCompletedRequest): P
     return { txHash: receipt.receipt.transactionHash };
   }
 
+  public async redeemNftWithPaymasterService(
+    body: NftRedeemRequest
+  ): Promise<{ txHash: string }> {
+    const chain = arbitrumSepolia;
+    const paymasterAddress = process.env.PAYMASTER_V08_ADDRESS as `0x${string}`;
+    const contractAddress = process.env.FRAMINO_NFT_CONTRACT_ADDRESS as `0x${string}`;
+    const ownerPrivateKey = process.env.CONTRACT_OWNER_PRIVATE_KEY as `0x${string}`;
+    const usdcAddress = process.env.USDC_ADDRESS as `0x${string}`;
+
+    // 1. Create viem client and owner smart account
+    const client = createPublicClient({ chain, transport: http() });
+    const owner = privateKeyToAccount(ownerPrivateKey);
+    const account = await toSimple7702SmartAccount({ client, owner });
+
+    // 2. Set up the paymaster
+    const paymaster = {
+        async getPaymasterData(parameters: any) {
+            const permitAmount = hexToBigInt('0x100000000');
+            const permitSignature = await signPermit({
+            tokenAddress: usdcAddress,
+            account,
+            client,
+            spenderAddress: paymasterAddress,
+            permitAmount: permitAmount,
+            });
+
+            const paymasterData = encodePacked(
+            ["uint8", "address", "uint256", "bytes"],
+            [0, usdcAddress, permitAmount, permitSignature],
+            );
+
+            return {
+            paymaster: paymasterAddress,
+            paymasterData,
+            paymasterVerificationGasLimit: hexToBigInt('0x200000'),
+            paymasterPostOpGasLimit: hexToBigInt('0x15000'),
+            isFinal: true,
+            };
+        },
+    };
+
+    // 3. Create bundler client
+    const bundlerClient = createBundlerClient({
+      account,
+      client,
+      paymaster,
+      userOperation: {
+        estimateFeesPerGas: async ({ bundlerClient }) => {
+          const fees = await bundlerClient.request({
+            method: "pimlico_getUserOperationGasPrice" as any,
+          });
+          if (
+            typeof fees === "object" &&
+            fees !== null &&
+            "standard" in fees &&
+            typeof (fees as any).standard === "object"
+          ) {
+            const maxFeePerGas = hexToBigInt((fees as any).standard.maxFeePerGas);
+            const maxPriorityFeePerGas = hexToBigInt((fees as any).standard.maxPriorityFeePerGas);
+            return { maxFeePerGas, maxPriorityFeePerGas };
+          } else {
+            throw new Error("Unexpected response from pimlico_getUserOperationGasPrice: " + JSON.stringify(fees));
+          }
+        },
+      },
+      transport: http(`https://public.pimlico.io/v2/${client.chain.id}/rpc`),
+    });
+
+    // 4. Prepare redeem call
+    const { user, id, amount } = body;
+    // If your contract's redeem function requires the user address, add it to args
+    const args = [user, id, amount];
+
+    // 5. Sign authorization for the smart account
+    const authorization = await owner.signAuthorization({
+      chainId: chain.id,
+      nonce: await client.getTransactionCount({ address: owner.address }),
+      contractAddress: account.authorization.address,
+    });
+
+    // 6. Send the redeem transaction as a UserOperation
+    const hash = await bundlerClient.sendUserOperation({
+      account,
+      calls: [
+        {
+          to: contractAddress,
+          abi: FraminoNFTAbi,
+          functionName: "redeem",
+          args: args,
+        },
+      ],
+      authorization: authorization,
+    });
+
+    const receipt = await bundlerClient.waitForUserOperationReceipt({ hash });
+    return { txHash: receipt.receipt.transactionHash };
+  }
 
   public async getContractInfoService() {
     const contractAddress = process.env.FRAMINO_NFT_CONTRACT_ADDRESS!;

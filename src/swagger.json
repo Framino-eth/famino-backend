@@ -66,6 +66,28 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"NftRedeemRequest": {
+				"properties": {
+					"user": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"user",
+					"id",
+					"amount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"GetContractInfoResponseModel": {
 				"properties": {
 					"address": {
@@ -209,6 +231,46 @@
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/NftMarkCompletedRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/framino/redeem-with-paymaster": {
+			"post": {
+				"operationId": "RedeemNft",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"txHash": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"txHash"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Framino"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NftRedeemRequest"
 							}
 						}
 					}

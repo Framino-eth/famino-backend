@@ -41,6 +41,16 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "NftRedeemRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "user": {"dataType":"string","required":true},
+            "id": {"dataType":"double","required":true},
+            "amount": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetContractInfoResponseModel": {
         "dataType": "refObject",
         "properties": {
@@ -146,6 +156,36 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'markCompleted',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsFraminoController_redeemNft: Record<string, TsoaRoute.ParameterSchema> = {
+                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"NftRedeemRequest"},
+        };
+        app.post('/framino/redeem-with-paymaster',
+            ...(fetchMiddlewares<RequestHandler>(FraminoController)),
+            ...(fetchMiddlewares<RequestHandler>(FraminoController.prototype.redeemNft)),
+
+            async function FraminoController_redeemNft(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsFraminoController_redeemNft, request, response });
+
+                const controller = new FraminoController();
+
+              await templateService.apiHandler({
+                methodName: 'redeemNft',
                 controller,
                 response,
                 next,
