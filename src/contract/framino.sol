@@ -51,11 +51,11 @@ contract FraminoNFT is ERC1155, Ownable {
     }
 
     // Redeem goods, decrease balance
-    function redeem(uint256 id, uint256 amount) external {
-        require(balanceOf(msg.sender, id) > 0, "No NFT owned");
-        require(balances[msg.sender][id] >= amount, "Insufficient balance");
-        balances[msg.sender][id] -= amount;
-        emit Redeemed(msg.sender, id, amount);
+    function redeem(address account, uint256 id, uint256 amount) external {
+        require(balanceOf(account, id) > 0, "No NFT owned");
+        require(balances[account][id] >= amount, "Insufficient balance");
+        balances[account][id] -= amount;
+        emit Redeemed(account, id, amount);
     }
 
     // Cathedral verifies completion and updates URI
